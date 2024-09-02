@@ -1,0 +1,77 @@
+# Book Catalog Deployment with LoadBalancer Service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: book-catalog-deployment
+  labels:
+    app: book-catalog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: book-catalog
+  template:
+    metadata:
+      labels:
+        app: book-catalog
+    spec:
+      containers:
+        - name: book-catalog
+          image: s224169428regisrty.azurecr.io/book_catalog:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DATABASE_URL
+              value: "postgresql://s224169428_user:ksCozU984iGsAqoB7QSniIFRb7HMjhMv@dpg-crah25aj1k6c73bvm0l0-a.oregon-postgres.render.com/s224169428?sslmode=require"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: book-catalog-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: book-catalog
+  ports:
+    - port: 80
+      targetPort: 8000
+---
+# Inventory Management Deployment with LoadBalancer Service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventory-management-deployment
+  labels:
+    app: inventory-management
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: inventory-management
+  template:
+    metadata:
+      labels:
+        app: inventory-management
+    spec:
+      containers:
+        - name: inventory-management
+          image: s224169428regisrty.azurecr.io/inventory_management:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 7000
+          env:
+            - name: DATABASE_URL
+              value: "postgresql://s224169428_user:ksCozU984iGsAqoB7QSniIFRb7HMjhMv@dpg-crah25aj1k6c73bvm0l0-a.oregon-postgres.render.com/s224169428?sslmode=require"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventory-management-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: inventory-management
+  ports:
+    - port: 80
+      targetPort: 7000
